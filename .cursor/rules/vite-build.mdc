@@ -1,0 +1,13 @@
+---
+globs: vite.config.ts
+description: Vite dev/build rules and asset handling
+---
+
+### Dev and build
+
+- Use scripts in [package.json](mdc:package.json): `dev`, `build`, `preview`.
+- Config sets `mode: "development"`, disables minification, enables sourcemaps for easier debugging.
+- JSX config: `esbuild.jsx = "automatic"`, `jsxImportSource = "react"`.
+- Static assets are copied via `vite-plugin-static-copy` from `./assets` and `./public/assets` into `dist`.
+- Path resolution via `vite-tsconfig-paths` is enabled; no custom `paths` are currently defined in TS config.
+

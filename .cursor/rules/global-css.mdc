@@ -1,0 +1,12 @@
+---
+globs: *.tsx,*.ts
+description: Global CSS utilities and accessibility affordances
+---
+
+### Global styles
+
+- Base styles, fonts, and utilities live in [index.css](mdc:index.css).
+- Smooth scrolling and a custom scrollbar are globally enabled.
+- Utility class `.glass-effect` is available for subtle glassmorphism.
+- Respect `prefers-reduced-motion`; avoid long-running animations unless guarded.
+

@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+description: High-level project structure and entry points
+---
+
+### Project structure and entry points
+
+- **HTML entry**: [index.html](mdc:index.html) mounts the app at `#root` and loads [main.tsx](mdc:main.tsx).
+- **Root render**: [main.tsx](mdc:main.tsx) wraps the app with `@kombai/react-error-boundary` and [KombaiWrapper.tsx](mdc:KombaiWrapper.tsx), then renders [src/App.GlobalCareerLink.tsx](mdc:src/App.GlobalCareerLink.tsx).
+- **Theme**: Global MUI theme in [src/theme.ts](mdc:src/theme.ts). `ThemeProvider` and `CssBaseline` are provided at the app level.
+- **Global styles**: [index.css](mdc:index.css) defines fonts, base styles, animations, and utility classes (e.g., `.glass-effect`).
+- **Sections**: Feature sections live in [src/components](mdc:src/components) and are composed in [src/App.GlobalCareerLink.tsx](mdc:src/App.GlobalCareerLink.tsx).
+- **Tooling**: Vite config in [vite.config.ts](mdc:vite.config.ts); ESLint config in [eslint.config.js](mdc:eslint.config.js).
+- **TypeScript**: Project configs in [tsconfig.json](mdc:tsconfig.json), [tsconfig.app.json](mdc:tsconfig.app.json), and [tsconfig.node.json](mdc:tsconfig.node.json).
+
+Use these references when navigating, adding components, or updating build/lint settings.
+

@@ -1,0 +1,18 @@
+---
+globs: *.ts,*.tsx
+description: TypeScript + React conventions for this codebase
+---
+
+### React + TS conventions
+
+- **JSX runtime**: Automatic. No need to import `React` for JSX, though some files do.
+- **Components**: Prefer function components. Type props explicitly; `React.FC` is acceptable where it improves clarity.
+- **Exports**: Match existing style — section components and `App` use default exports.
+- **Types**: Avoid `any`. Use MUI types (e.g., `SxProps<Theme>`, `ButtonProps`) and React types (`React.ReactNode`, `React.CSSProperties` sparingly).
+- **Purity**: Keep presentation components stateless/side-effect free. Lift state up when needed.
+
+### App wrappers
+
+- `ThemeProvider` and `CssBaseline` are already applied in [src/App.GlobalCareerLink.tsx](mdc:src/App.GlobalCareerLink.tsx). Do not re-wrap per component.
+- Use hooks following the rules-of-hooks; see lint rules in [eslint.config.js](mdc:eslint.config.js).
+

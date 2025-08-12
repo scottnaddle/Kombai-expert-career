@@ -1,0 +1,14 @@
+---
+globs: *.tsx
+description: Material UI + Emotion styling guide and theme usage
+---
+
+### MUI + Emotion
+
+- **Theme**: Use palette, typography, and shadows from [src/theme.ts](mdc:src/theme.ts). Prefer `sx` over inline `style`.
+- **Components**: Prefer `Box`, `Container`, `Grid`, `Stack`, `Typography`, `Button`, etc., over raw elements.
+- **Typography**: Use `Typography` variants instead of manual font sizes. Global fonts are set in [index.css](mdc:index.css).
+- **Colors**: Use theme keys — `primary`, `secondary`, `success`, `warning`, `info`, `text`, `background`, and `grey` scale.
+- **Shadows**: Use indices defined in the theme (0–24). Avoid custom box-shadows unless necessary.
+- **Emotion cache**: The app uses an Emotion cache with key "mui" via `CacheProvider` in [src/App.GlobalCareerLink.tsx](mdc:src/App.GlobalCareerLink.tsx). Components should not create their own cache.
+

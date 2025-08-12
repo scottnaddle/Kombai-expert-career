@@ -1,0 +1,130 @@
+---
+alwaysApply: false
+description: TRD - AI 모델 및 시스템 아키텍처
+---
+
+# TRD (기술 요구사항 정의서): AI 모델 및 시스템 아키텍처
+
+본 TRD는 PRD에 정의된 제품 요구사항을 안정적이고 확장 가능하게 구현하기 위한 기술적 방법론과 시스템 구조를 정의한다. 특히 AI 모델의 설계와 데이터 처리 파이프라인을 중심으로 기술한다.
+
+## 1. 전체 시스템 아키텍처
+
+서비스의 유연성, 확장성, 유지보수성을 극대화하기 위해 MSA(Microservices Architecture)를 기반으로 클라우드 네이티브 환경에 구축한다.
+
+- **아키텍처 패러다임**: MSA (Microservices Architecture)
+- **배포 환경**: AWS 또는 GCP와 같은 Public Cloud
+- **컨테이너 오케스트레이션**: Kubernetes (AWS EKS, GCP GKE)
+
+### 주요 마이크로서비스 구성
+
+- **User Service**: 회원 가입, 로그인, 인증(OAuth 2.0/JWT), 프로필 관리 등 사용자 계정 관련 모든 기능 담당.
+- **Career Service**: 경력 데이터의 CRUD(생성, 조회, 수정, 삭제), 증빙서류 업로드 및 저장(Cloud Storage 연동) 담당.
+- **Certification Service**: 경력증명서 템플릿 관리, 데이터 매핑, PDF 생성 및 발급, 진위확인 기능 담당.
+- **AI-Inference Service**: 학습된 AI 모델(역량 추출, 추천 등)을 서빙하기 위한 전용 API 서버. GPU 인스턴스를 활용하여 고성능 추론 지원.
+- **Notification Service**: 이메일, SMS, 앱 푸시 등 사용자 알림을 담당하는 비동기 메시지 큐(SQS, RabbitMQ) 기반 서비스.
+- **API Gateway**: 외부의 모든 요청을 받아 적절한 마이크로서비스로 라우팅하고, 인증, 로깅, Rate Limiting 등 공통 기능 처리.
+
+### 인프라 구성 요소
+
+- Compute: Amazon EKS / Google GKE
+- Storage: Amazon S3 / Google Cloud Storage (증빙서류 등 바이너리 파일 저장)
+- Database: Amazon RDS (PostgreSQL), Amazon ElastiCache (Redis), Pinecone/Milvus (Vector DB)
+- Networking: API Gateway, Load Balancer, VPC
+- CI/CD: Jenkins, GitHub Actions, ArgoCD
+
+```
+[Client (Web/Mobile)] <--> [API Gateway] <--> [Load Balancer]
+                                |
+            +-------------------+-------------------+
+            |                   |                   |
+      [User Service]     [Career Service]   [Certification Svc]
+      (DB: User)         (DB: Career)       (PDF Generation)
+            |                   |                   |
+            +-------------------+-------------------+
+                                |
+      [AI-Inference Service (GPU)] <--> [AI Models]
+            |                   |
+[Notification Svc] <--> [Message Queue]
+(Email, SMS)
+```
+
+## 2. AI 모델 설계 및 개발 요구사항
+
+서비스의 핵심 차별화를 담당하는 AI 모델들은 목적에 따라 최적의 기술을 적용하여 개발한다.
+
+### 모델 1: 역량 키워드 추출 및 분류 모델 (Competency Extractor)
+
+- **목표**: 사용자의 경력 기술서(자유 텍스트)에서 의미 있는 역량 키워드를 추출하고, 사전 정의된 카테고리로 분류한다.
+- **핵심 기술**: 한국어 자연어 처리(NLP) 기반의 NER(Named Entity Recognition) 및 텍스트 분류(Text Classification).
+- **학습 데이터 구축**:
+  - 국내외 채용 사이트(LinkedIn, 사람인 등)의 해외사업 관련 직무기술서(Job Description) 대량 크롤링.
+  - KOTRA, 무역협회 등에서 발간하는 산업/시장 보고서.
+  - 전문가들의 동의 하에 확보된 이력서 데이터.
+  - 데이터 라벨링 도구(예: Label Studio)를 사용하여 '지역명', '산업명', '스킬명', '성과' 등을 태깅하여 고품질의 자체 학습 데이터셋 구축.
+- **개발 프로세스**:
+  - 전처리: 입력된 텍스트의 오탈자 교정, 불용어 제거, 형태소 분석(e.g., KoNLPy, Mecab).
+  - NER 모델링: Bi-LSTM-CRF, BERT-CRF 등 딥러닝 기반 NER 모델을 사용하여 미리 정의된 개체명(지역, 산업, 기술, 자격증 등)을 추출.
+  - 분류 모델링: 문장 또는 문단 전체의 맥락을 이해하여 '협상', '시장분석', '법률검토' 등 추상적인 직무 역량 카테고리로 분류. (BERT 기반의 Text Classifier 활용)
+  - 모델 서빙: 학습된 모델을 ONNX 또는 TorchScript 형식으로 변환하여 AI-Inference Service를 통해 API로 제공.
+
+### 모델 2: 경력 개발 로드맵 추천 엔진 (Career Path Recommender)
+
+- **목표**: 사용자의 현재 역량과 목표 직무를 기반으로 개인화된 교육, 자격증, 추천 프로젝트 등 경력 개발 경로를 제시한다.
+- **핵심 기술**: 협업 필터링(Collaborative Filtering)과 콘텐츠 기반 필터링(Content-based Filtering)을 결합한 하이브리드 추천 시스템.
+- **개발 프로세스**:
+  - 콘텐츠 기반 필터링 (1단계):
+    - 사용자의 현재 역량 프로필(모델 1에서 추출)과 목표 직무의 요구 역량 프로필(채용 공고 분석으로 생성)을 벡터로 표현.
+    - 두 벡터 간의 코사인 유사도(Cosine Similarity) 등을 계산하여 역량 차이(Gap)를 식별.
+    - 이 Gap을 메울 수 있는 교육/자격증(콘텐츠의 속성 기반)을 1차로 추천.
+  - 협업 필터링 (2단계):
+    - '현재 사용자와 유사한 역량 프로필을 가졌던 다른 사용자들이 목표 직무에 도달하기 위해 어떤 경로(교육, 자격증, 경력)를 거쳤는가?'를 분석.
+    - 사용자-아이템(교육, 자격증) 행렬을 만들고, 행렬 분해(Matrix Factorization) 기법(e.g., SVD, ALS)을 적용하여 잠재 요인을 분석하고 추천 점수를 계산.
+  - 하이브리드 결합 (최종): 콘텐츠 기반 추천 결과와 협업 필터링 추천 결과에 가중치를 부여하여 결합(Ensemble)하거나, 순차적으로 적용하여 최종 추천 리스트를 생성. 이를 통해 콜드 스타트(Cold Start) 문제를 완화하고 추천의 정확도를 높임.
+
+### 모델 3: RAG 기반 정보 제공 챗봇 (Consulting Chatbot)
+
+- **목표**: 해외사업 실무와 관련된 사용자의 질문에 대해 신뢰할 수 있는 정보를 기반으로 정확한 답변을 제공한다.
+- **핵심 기술**: 사전 훈련된 LLM(Large Language Model, 예: OpenAI GPT-4, Naver HyperCLOVA X) + RAG(Retrieval-Augmented Generation).
+- **개발 프로세스**:
+  - 지식 베이스 구축 (Indexing):
+    - 신뢰할 수 있는 정보 소스(KOTRA 보고서, 관세법령정보포털, 정부 보도자료 등)를 주기적으로 수집.
+    - 수집된 문서를 의미 있는 단위(Chunk)로 분할.
+    - 분할된 각 Chunk를 임베딩 모델(e.g., SBERT, OpenAI Ada)을 사용하여 고차원 벡터로 변환.
+    - 변환된 벡터를 원문 텍스트와 함께 벡터 데이터베이스(Vector DB)에 저장(Indexing).
+  - 질의응답 프로세스 (Retrieval & Generation):
+    - 사용자의 질문이 입력되면, 동일한 임베딩 모델을 사용하여 질문을 벡터로 변환.
+    - 벡터 DB에서 질문 벡터와 의미적으로 가장 유사한(가까운) 문서 Chunk들을 검색(Retrieval).
+    - 검색된 문서 내용(Context)과 사용자의 원본 질문을 프롬프트(Prompt)로 구성하여 LLM에 전달.
+    - LLM은 주어진 Context를 바탕으로 환각(Hallucination)을 최소화하며 정확하고 근거 있는 답변을 생성(Generation). 답변과 함께 참고한 원문 출처를 명시.
+
+## 3. 데이터베이스 및 데이터 파이프라인
+
+### RDBMS (Relational Database)
+- 선택: PostgreSQL 또는 MySQL (Amazon RDS).
+- 용도: 트랜잭션의 일관성과 데이터 무결성이 중요한 정형 데이터 저장. (사용자 정보, 경력 기본 정보, 결제 내역, 인증서 발급 이력 등)
+
+### NoSQL - Document Store / Search Engine
+- 선택: Elasticsearch 또는 OpenSearch.
+- 용도: 경력 기술서, 프로젝트 설명 등 비정형 텍스트 데이터의 전문(Full-text) 검색 및 빠른 분석. 기업 회원의 인재 검색 기능 구현에 필수적.
+
+### Vector DB (Vector Database)
+- 선택: Pinecone, Milvus, Weaviate 등 관리형 또는 오픈소스 벡터 DB.
+- 용도: RAG 챗봇의 지식 베이스 및 추천 시스템의 임베딩 벡터를 효율적으로 저장하고, 유사도 기반의 빠른 검색(ANN, Approximate Nearest Neighbor)을 지원.
+
+### 데이터 파이프라인 (ETL)
+- 기술: Apache Airflow, AWS Glue 등.
+- 목표: 외부의 다양한 데이터 소스(파트너사 교육 정보, 채용 공고, 정부 보고서 등)를 주기적으로 수집(Extract), 시스템에 맞는 형태로 가공(Transform), 적재(Load)하는 파이프라인을 구축하여 데이터의 최신성을 유지.
+
+## 4. 보안 요구사항
+
+사용자의 민감한 개인정보와 경력 데이터를 다루는 만큼, 최고 수준의 보안 체계를 구축해야 한다.
+
+- **규제 준수**: 개인정보보호법(PIPA), 정보통신망법 등 국내 법규와 GDPR 등 글로벌 표준을 준수하는 설계.
+- **데이터 암호화**:
+  - 전송 구간 암호화: 모든 API 통신은 TLS 1.2 이상을 사용하여 암호화.
+  - 저장 데이터 암호화(At-rest): 데이터베이스와 스토리지에 저장되는 모든 개인 식별 정보(주민번호, 연락처 등)와 증빙서류 파일은 AES-256 등 강력한 알고리즘으로 암호화.
+- **접근 제어**:
+  - 역할 기반 접근 제어(RBAC)를 통해 사용자의 역할에 따라 데이터 접근 권한을 엄격히 통제.
+  - 민감 데이터(증빙서류 원본 등)에 대한 접근은 최소한의 관리자에게만 허용하고, 모든 접근 행위는 감사 로그(Audit Log)로 기록.
+- **취약점 관리**: 정기적인 모의 해킹 및 소스코드 보안 취약점 점검(SAST/DAST) 수행.
+

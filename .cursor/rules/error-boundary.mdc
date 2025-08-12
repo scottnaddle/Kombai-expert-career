@@ -1,0 +1,11 @@
+---
+globs: main.tsx, KombaiWrapper.tsx, src/**/*.tsx
+description: Error boundary, wrappers, and error-handling expectations
+---
+
+### Error boundary and wrappers
+
+- The app root is wrapped with `@kombai/react-error-boundary` in [main.tsx](mdc:main.tsx).
+- Throw `Error` instances (not strings) from components for predictable boundary handling.
+- [KombaiWrapper.tsx](mdc:KombaiWrapper.tsx) is a pass-through container for global providers; keep it lightweight.
+

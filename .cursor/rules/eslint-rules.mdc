@@ -1,0 +1,13 @@
+---
+globs: *.ts,*.tsx
+description: ESLint rules in this repo
+---
+
+### Linting
+
+- Config is in [eslint.config.js](mdc:eslint.config.js) and targets `**/*.{ts,tsx}`.
+- Extends `@eslint/js` and `typescript-eslint` recommended configs.
+- Enforces React Hooks rules via `eslint-plugin-react-hooks`.
+- Warns if files export non-components with React Fast Refresh enabled: `react-refresh/only-export-components`.
+- Browser globals are enabled via `globals.browser`.
+

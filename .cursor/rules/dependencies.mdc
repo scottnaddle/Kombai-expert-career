@@ -1,0 +1,15 @@
+---
+alwaysApply: false
+description: Key runtime dependencies used in the UI layer
+---
+
+### Libraries in use
+
+- **Material UI** (`@mui/material`, icons/x-packages) with **Emotion** for styling.
+- **React 19** and **React DOM 19**.
+- **Redux Toolkit** and **React Redux** (not yet wired up in the current entry).
+- **React Router 7** (not currently used in the app root).
+- **Date-fns** for date utilities.
+
+When introducing code that uses these libs, follow the established patterns in the rest of the rules, and prefer theme-driven MUI components over custom DOM/CSS.
+

@@ -1,0 +1,13 @@
+---
+globs: src/components/*.tsx
+description: Section component patterns and composition
+---
+
+### Sections
+
+- Each section is presentational and is composed in [src/App.GlobalCareerLink.tsx](mdc:src/App.GlobalCareerLink.tsx) in page order.
+- Use `Container` with appropriate `maxWidth` and responsive spacing.
+- Prefer `Box` with `sx` for layout, using theme spacing (8px base scale).
+- Keep side-effects and data fetching out of sections.
+- Maintain consistent typography using theme variants.
+
