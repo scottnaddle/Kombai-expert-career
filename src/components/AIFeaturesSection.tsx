@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box, Container, Typography, Stack, Paper } from '@mui/material';
+import { Box, Container, Typography, Stack, Paper, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { RadarChart } from '@mui/x-charts/RadarChart';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import InsightIcon from '@mui/icons-material/Insights';
@@ -47,6 +46,7 @@ const AIFeaturesSection: React.FC = () => {
     { skill: '언어 능력', value: 80 },
     { skill: '문화 이해', value: 75 }
   ];
+
 
   const aiFeatures = [
     {
@@ -103,19 +103,34 @@ const AIFeaturesSection: React.FC = () => {
                     AI 역량 맵 시각화
                   </Typography>
                   
-                  <Box sx={{ width: '100%', height: 400, display: 'flex', justifyContent: 'center' }}>
-                    <RadarChart
-                      width={350}
-                      height={350}
-                      series={[
-                        {
-                          data: competencyData.map(item => item.value),
-                          color: '#2563EB'
-                        }
-                      ]}
-                      radar={competencyData.map(item => item.skill)}
-                      skipAnimation={false}
-                    />
+                  <Box sx={{ width: '100%', px: 2 }}>
+                    <Stack spacing={3}>
+                      {competencyData.map((item, index) => (
+                        <Box key={index}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography variant="body2" fontWeight="medium">
+                              {item.skill}
+                            </Typography>
+                            <Typography variant="body2" color="primary.main" fontWeight="bold">
+                              {item.value}%
+                            </Typography>
+                          </Box>
+                          <LinearProgress
+                            variant="determinate"
+                            value={item.value}
+                            sx={{
+                              height: 8,
+                              borderRadius: 4,
+                              bgcolor: 'grey.200',
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 4,
+                                background: `linear-gradient(90deg, #2563EB, #60A5FA)`
+                              }
+                            }}
+                          />
+                        </Box>
+                      ))}
+                    </Stack>
                   </Box>
                   
                   <Typography variant="body2" color="text.secondary" textAlign="center">

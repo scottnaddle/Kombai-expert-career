@@ -5,6 +5,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import GavelIcon from '@mui/icons-material/Gavel';
 import SecurityIcon from '@mui/icons-material/Security';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 const ComparisonCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),

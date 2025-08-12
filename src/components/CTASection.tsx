@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Container, Typography, Stack, Button, TextField, Paper, Chip } from '@mui/material';
+import { Box, Container, Typography, Stack, Button, TextField, Paper, Chip, Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Link } from 'react-router-dom';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
+import LoginIcon from '@mui/icons-material/Login';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 const CTAContainer = styled(Box)(({ theme }) => ({
   background: `linear-gradient(135deg, 
@@ -207,6 +212,8 @@ const CTASection: React.FC = () => {
                 </Stack>
 
                 <Button
+                  component={Link}
+                  to="/signup"
                   variant="contained"
                   size="large"
                   fullWidth
@@ -226,6 +233,37 @@ const CTASection: React.FC = () => {
                 >
                   AI 역량 분석 시작하기
                 </Button>
+
+                <Divider sx={{ my: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    또는
+                  </Typography>
+                </Divider>
+
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    component={Link}
+                    to="/login"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    startIcon={<LoginIcon />}
+                    sx={{ borderRadius: '12px' }}
+                  >
+                    로그인
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="/verify"
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    startIcon={<VerifiedIcon />}
+                    sx={{ borderRadius: '12px' }}
+                  >
+                    인증서 검증
+                  </Button>
+                </Stack>
 
                 <Typography variant="caption" color="text.secondary" textAlign="center">
                   베타 서비스 기간 중 모든 기능을 무료로 이용하실 수 있습니다. <br />

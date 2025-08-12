@@ -1,8 +1,11 @@
 import React from 'react';
 import { Box, Container, Typography, Button, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Link } from 'react-router-dom';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const HeroContainer = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
@@ -122,8 +125,10 @@ const HeroSection: React.FC = () => {
               글로벌 커리어의 새로운 가능성을 발견하세요
             </Typography>
             
-            <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4 }}>
               <Button
+                component={Link}
+                to="/signup"
                 variant="contained"
                 size="large"
                 startIcon={<PsychologyIcon />}
@@ -143,6 +148,8 @@ const HeroSection: React.FC = () => {
               </Button>
               
               <Button
+                component={Link}
+                to="/certification"
                 variant="outlined"
                 size="large"
                 startIcon={<TrendingUpIcon />}
@@ -161,6 +168,26 @@ const HeroSection: React.FC = () => {
                 }}
               >
                 경력 증명서 발급
+              </Button>
+            </Stack>
+
+            {/* Quick Access Links */}
+            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+              <Button
+                component={Link}
+                to="/login"
+                variant="text"
+                size="small"
+                startIcon={<LoginIcon />}
+                sx={{
+                  color: 'text.secondary',
+                  '&:hover': {
+                    color: 'primary.main',
+                    backgroundColor: 'transparent'
+                  }
+                }}
+              >
+                이미 계정이 있으신가요?
               </Button>
             </Stack>
             
